@@ -1,3 +1,5 @@
+All credit to https://gitlab.com/KevinJClark/busiestbox#invoke - this is just a fork for my convinience 
+
 # BusiestBox
 
 BusiestBox is a single-EXE, interactive Swiss-army shell for working with the local filesystem, **an in-memory VFS (`vfs://`)**, and the network. Most commands understand URLs, so you can pipe data to/from HTTP(S) without extra tooling. No third-party libraries required; targets **.NET Framework 4.7.2**.
