@@ -33,14 +33,22 @@ jobs:
       run: echo "timestamp=$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_OUTPUT
       shell: bash
     
-    - name: Commit binary to repo
+    - name: Generate base64 encoded version
+      run: |
+        $bytes = [System.IO.File]::ReadAllBytes("BusiestBox/bin/Release/BusiestBox.exe")
+        $base64 = [Convert]::ToBase64String($bytes)
+        [System.IO.File]::WriteAllText("BusiestBox/bin/Release/BusiestBox.exe.b64", $base64)
+      shell: pwsh
+    
+    - name: Commit binary and base64 to repo
       run: |
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
         mkdir -p release
         cp BusiestBox/bin/Release/BusiestBox.exe release/BusiestBox.exe
-        git add release/BusiestBox.exe
-        git diff --quiet && git diff --staged --quiet || git commit -m "Auto-build: Update release binary"
+        cp BusiestBox/bin/Release/BusiestBox.exe.b64 release/BusiestBox.exe.b64
+        git add release/BusiestBox.exe release/BusiestBox.exe.b64
+        git diff --quiet && git diff --staged --quiet || git commit -m "Auto-build: Update release binary and base64"
         git push
       shell: bash
     
@@ -52,7 +60,13 @@ jobs:
         body: |
           Automated build from commit ${{ github.sha }}
           Built on: ${{ steps.timestamp.outputs.timestamp }}
-        files: BusiestBox/bin/Release/BusiestBox.exe
+          
+          Files:
+          - BusiestBox.exe - Compiled executable
+          - BusiestBox.exe.b64 - Base64 encoded for MSBuild stager
+        files: |
+          BusiestBox/bin/Release/BusiestBox.exe
+          BusiestBox/bin/Release/BusiestBox.exe.b64
         draft: false
         prerelease: false
       env:
